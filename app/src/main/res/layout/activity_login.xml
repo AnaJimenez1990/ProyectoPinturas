@@ -11,6 +11,7 @@
     tools:context="com.example.anagabriela.proyectopinturas.LoginActivity">
 
     <!-- Login progress -->
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="114dp"
@@ -78,13 +79,12 @@
             </android.support.design.widget.TextInputLayout>
 
             <LinearLayout
-                android:layout_width="198dp"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/email_sign_in_button"
-
                     android:layout_width="106dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -93,6 +93,22 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Registrar"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Button"
+                    android:onClick= "abrirRegistro"/>
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

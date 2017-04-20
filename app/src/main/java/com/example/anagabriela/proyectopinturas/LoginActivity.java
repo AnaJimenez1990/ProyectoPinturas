@@ -1,8 +1,9 @@
 package com.example.anagabriela.proyectopinturas;
-
+import android.content.Context;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -31,12 +32,32 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+
+    public static Context context;
+    private boolean a=false;
+    public static Context getAppContext()
+    {
+        return context;
+    }
+
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -48,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "usuario@gmail.com:clave", "bar@example.com:world"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -60,6 +81,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private boolean valor;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +169,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void attemptLogin() {
         if (mAuthTask != null) {
-            return;
+           // return;
         }
 
         // Reset errors.
@@ -297,6 +322,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mEmail;
         private final String mPassword;
 
+
+
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -304,25 +331,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                acceder(mEmail,mPassword);
+               return a;
+            } catch (Exception e) {
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
         }
 
         @Override
@@ -331,7 +348,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
+                Intent i = new Intent(getApplicationContext(), Pedido.class);
+                startActivity(i);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -343,6 +361,51 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    public void abrirRegistro(View v) {
+        Intent i = new Intent(getApplicationContext(), Registro.class);
+        startActivity(i);
+    }
+
+    public JsonObjectRequest acceso (String usr,String pass){
+        String url = "http://colorexpression.esy.es/acceso.php?username="+usr+"&password="+pass;
+        JsonObjectRequest jor = new JsonObjectRequest(
+                Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                valor = response.optBoolean("access");
+                String respuesta;
+
+                if(valor){
+                    a = true;
+                    respuesta = "verdadero";
+                }else{
+                    a = false;
+                    respuesta = "falso";
+                }
+                ((TextView)findViewById(R.id.TextView)).setText(respuesta);
+
+
+            }
+        },new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+
+
+        );
+        return jor;
+
+    }
+
+    public void acceder(String usr,String pass){
+        this.context = getApplicationContext();
+        VolleySingleton vs = VolleySingleton.getInstance();
+        vs.getRequestQueue().add(acceso(usr,pass));
+
     }
 }
 
