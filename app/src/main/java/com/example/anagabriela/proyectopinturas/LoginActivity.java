@@ -64,17 +64,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "usuario@gmail.com:clave", "bar@example.com:world"
-    };
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserLoginTask mAuthTask = null ;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -82,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
-    private boolean valor;
 
 
 
@@ -169,7 +162,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void attemptLogin() {
         if (mAuthTask != null) {
-           // return;
+            return;
         }
 
         // Reset errors.
@@ -327,12 +320,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
-
             try {
                 acceder(mEmail,mPassword);
                return a;
@@ -347,7 +339,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
+            if (success ||a) {
                 Intent i = new Intent(getApplicationContext(), Pedido.class);
                 startActivity(i);
             } else {
@@ -374,17 +366,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                valor = response.optBoolean("access");
-                String respuesta;
+                a = response.optBoolean("access");
 
-                if(valor){
-                    a = true;
-                    respuesta = "verdadero";
-                }else{
-                    a = false;
-                    respuesta = "falso";
-                }
-                ((TextView)findViewById(R.id.TextView)).setText(respuesta);
 
 
             }
