@@ -10,20 +10,33 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Registro extends AppCompatActivity {
 
     private EditText mEmail;
     private EditText mPass;
+    private EditText mNombre;
+    private  EditText mApellido;
+    private EditText mTel;
+
+
 
     public static Context context;
-    private boolean a=false;
-    public static Context getAppContext()
-    {
-        return context;
-    }
 
+
+    private String resp="";
 
 
     @Override
@@ -31,9 +44,10 @@ public class Registro extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
         mEmail = (EditText) findViewById(R.id.mail);
-
-
-        mPass = (EditText) findViewById(R.id.password);
+        mPass = (EditText) findViewById(R.id.pass);
+        mNombre = (EditText) findViewById(R.id.nombre);
+        mApellido = (EditText) findViewById(R.id.apellido);
+        mTel=(EditText) findViewById(R.id.tel);
 
 
         Button mRegistrar = (Button) findViewById(R.id.registrar);
@@ -41,12 +55,17 @@ public class Registro extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 registrarUsuario();
+
             }
         });
 
 
     }
 
+    public static Context getAppContext()
+    {
+        return context;
+    }
     private boolean isEmailValid(String email) {
 
         return email.contains("@");
@@ -62,11 +81,9 @@ public class Registro extends AppCompatActivity {
 
 
     private void registrarUsuario() {
-
-
         // Reset errors.
-        //mEmail.setError(null);
-       // mPass.setError(null);
+        mEmail.setError(null);
+        mPass.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmail.getText().toString();
@@ -100,9 +117,42 @@ public class Registro extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            context = getApplicationContext();
+            VolleySingleton v = VolleySingleton.getInstance();
+            v.getRequestQueue().add( jorRegistrar());
 
-          //  mAuthTask = new UserLoginTask(email, password);
-          //  mAuthTask.execute((Void) null);
         }
+
     }
+
+    public JsonObjectRequest jorRegistrar (){
+        String correo = mEmail.getText().toString();
+        String pass = mPass.getText().toString();
+        String nombre = mNombre.getText().toString();
+        String apellido = mApellido.getText().toString();
+        String tel = mTel.getText().toString();
+        String url = "http://colorexpression.esy.es/registrarcliente.php?correo="+correo
+                +"&password="+pass+"&nombre="+nombre+"&apellido="+apellido+"&tel="+tel;
+
+        JsonObjectRequest jor = new JsonObjectRequest(
+                Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast toast = Toast.makeText(context, "Usuario Registrado", Toast.LENGTH_LONG);
+                toast.show();
+                resp = response.optString("IdCarrera");
+
+            }
+        },new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+
+        );
+        return jor;
+
+    }
+
 }
