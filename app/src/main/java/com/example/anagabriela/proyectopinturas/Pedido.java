@@ -6,6 +6,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,6 +27,10 @@ import org.json.JSONObject;
 public class Pedido extends AppCompatActivity {
 
     private static Context context;
+    private String correo ;
+    private String resp;
+
+    public static final int ActivityID = 24;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,19 @@ public class Pedido extends AppCompatActivity {
 
         VolleySingleton vs = VolleySingleton.getInstance();
         vs.getRequestQueue().add(jorObtenerListaColores());
+
+
+
+
+        Button mPedido = (Button) findViewById(R.id.realizarpedido);
+        mPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                realizarPedido();
+
+            }
+        });
+
     }
 
     public static Context getAppContext()
@@ -42,6 +61,50 @@ public class Pedido extends AppCompatActivity {
         return context;
     }
 
+
+
+    private void realizarPedido(){
+        VolleySingleton vsi = VolleySingleton.getInstance();
+        vsi.getRequestQueue().add(jorRegistrarPedido());
+        Toast toast = Toast.makeText(getApplicationContext() , "Pedido Realizado", Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+
+    public JsonObjectRequest jorRegistrarPedido (){
+        Intent i = getIntent();
+        correo = i.getExtras().get("Correo").toString();
+        String url = "http://colorexpression.esy.es/realizarpedido.php?correo="+correo
+                +"&color=1";
+
+        JsonObjectRequest jor = new JsonObjectRequest(
+                Request.Method.GET,url,null,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                resp = response.optString("IdCarrera");
+               // finish();
+
+            }
+        },new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+
+        );
+        return jor;
+
+    }
+
+    @Override
+    public void onActivityResult(int requestcode, int resultcode,Intent da){
+        if (requestcode== ActivityID){
+            correo = da.getExtras().get("correo").toString();
+
+        }
+    }
 
     public JsonObjectRequest jorObtenerListaColores (){
         String url = "http://colorexpression.esy.es/coloresdisponibles.php";

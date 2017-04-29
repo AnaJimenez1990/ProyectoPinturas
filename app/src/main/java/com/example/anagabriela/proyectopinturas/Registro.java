@@ -117,7 +117,7 @@ public class Registro extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            context = getApplicationContext();
+            context = getAppContext();
             VolleySingleton v = VolleySingleton.getInstance();
             v.getRequestQueue().add( jorRegistrar());
 
@@ -141,6 +141,7 @@ public class Registro extends AppCompatActivity {
                 Toast toast = Toast.makeText(context, "Usuario Registrado", Toast.LENGTH_LONG);
                 toast.show();
                 resp = response.optString("IdCarrera");
+                finish();
 
             }
         },new Response.ErrorListener() {
